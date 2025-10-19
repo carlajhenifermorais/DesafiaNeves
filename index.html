@@ -117,19 +117,29 @@
     checkCompletion();
 
     document.getElementById('shareButton').addEventListener('click', async () => {
-      const shareData = {
-        img: href="imagemconcluido.png",
+    try {
+        // Carrega a imagem
+        const response = await fetch('imagemconcluido.png');
+        const blob = await response.blob();
+        const file = new File([blob], 'imagemconcluido.png', { type: blob.type });
+
+        const shareData = {
         title: 'Desafio 7 Dias pelo Planeta Água',
         text: 'Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍 Participe também! #PlanetaÁgua #Todos pela água',
-        url: window.location.href
-      };
-      try {
+        files: [file] // aqui tá a imagem
+        };
+
+        // Checa se o navegador suporta compartilhamento de arquivos
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share(shareData);
-      } catch (err) {
-        alert('Copie e compartilhe: Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍');
-      }
+        console.log('Compartilhado com sucesso!');
+        } else {
+        alert('Seu navegador não suporta compartilhamento de arquivos 😕');
+        }
+    } catch (err) {
+        console.error('Erro ao compartilhar:', err);
+    }
     });
   </script>
 </body>
 </html>
-
