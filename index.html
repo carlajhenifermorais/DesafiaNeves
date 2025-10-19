@@ -21,8 +21,8 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
-          <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
           <li class="nav-item"><a class="nav-link" href="#desafios">Desafios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
         </ul>
       </div>
     </div>
@@ -58,9 +58,7 @@
   </section>
 
   <!-- Mensagem de parabéns -->
-  <div id="mensagem" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
-       background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3); font-size:18px; z-index:9999;">
-  </div>
+  <div id="mensagem"></div>
 
   <footer class="text-center py-3 text-white">
     <p class="mb-0">&copy; 2025 Desafio 7 Dias pelo Planeta Água</p>
@@ -82,9 +80,17 @@
     const completionBanner = document.getElementById('completion-banner');
     const mensagem = document.getElementById('mensagem');
 
+    // Pega status salvo no localStorage
+    const completed = JSON.parse(localStorage.getItem('completedChallenges')) || Array(7).fill(false);
+
+    // Cria cards
     desafios.forEach((texto, index) => {
       const card = document.createElement('div');
       card.className = 'col-md-4';
+
+      const isCompleted = completed[index] ? true : false;
+      const buttonText = isCompleted ? '✅ Concluído!' : 'Concluir';
+
       card.innerHTML = `
         <div class="flip-card">
           <div class="flip-card-inner" id="card-${index}">
@@ -94,7 +100,7 @@
             </div>
             <div class="flip-card-back d-flex align-items-center justify-content-center flex-column">
               <p>${texto}</p>
-              <button class="btn btn-success mt-3" onclick="markCompleted(${index})">Concluído</button>
+              <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-success'} mt-3" id="btn-${index}" onclick="markCompleted(${index})">${buttonText}</button>
             </div>
           </div>
         </div>
@@ -102,32 +108,37 @@
       container.appendChild(card);
     });
 
+    // Flip card
     document.querySelectorAll('.flip-card').forEach(card => {
       card.addEventListener('click', () => {
         card.querySelector('.flip-card-inner').classList.toggle('flipped');
       });
     });
 
-    const completed = JSON.parse(localStorage.getItem('completedChallenges')) || Array(7).fill(false);
-
+    // Função para marcar como concluído
     function markCompleted(i) {
+      if (completed[i]) return; // evita duplo clique
+
       completed[i] = true;
       localStorage.setItem('completedChallenges', JSON.stringify(completed));
 
+      // Atualiza botão
+      const btn = document.getElementById(`btn-${i}`);
+      btn.textContent = '✅ Concluído!';
+      btn.classList.remove('btn-success');
+      btn.classList.add('btn-secondary');
+
       // Confete
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
       // Mensagem
-      if (i < 6) { // dias 1 a 6
+      if (i < 6) {
         mensagem.textContent = 'Parabéns e até amanhã!';
-      } else { // dia 7
+      } else {
         mensagem.textContent = 'Parabéns! Você completou o desafio dos 7 dias!';
       }
       mensagem.style.display = 'block';
+      mensagem.style.animation = 'fadeInOut 2s forwards';
 
       setTimeout(() => {
         mensagem.style.display = 'none';
@@ -136,6 +147,7 @@
       checkCompletion();
     }
 
+    // Checa se completou todos
     function checkCompletion() {
       if (completed.every(c => c)) {
         completionBanner.classList.remove('d-none');
@@ -144,6 +156,7 @@
 
     checkCompletion();
 
+    // Compartilhar
     document.getElementById('shareButton').addEventListener('click', async () => {
       try {
         const response = await fetch('imagemconcluido.png');
