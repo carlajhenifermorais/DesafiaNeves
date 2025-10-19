@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,7 +6,6 @@
   <title>Desafio 7 Dias pelo Planeta Água</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <!-- Biblioteca de confete -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
@@ -48,8 +46,15 @@
   <!-- Desafios -->
   <section id="desafios" class="py-5 bg-light">
     <div class="container">
-      <h2 class="text-center mb-5">💦 Os 7 Desafios</h2>
+      <h2 class="text-center mb-3">💦 Os 7 Desafios</h2>
+
+      <!-- Barra de progresso -->
+      <div class="progress mb-4">
+        <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%">0%</div>
+      </div>
+
       <div class="row g-4" id="cards-container"></div>
+
       <div id="completion-banner" class="text-center mt-5 d-none">
         <h3 class="mb-4">🏁 Você completou os 7 desafios!</h3>
         <button id="shareButton" class="btn btn-primary mt-3">Compartilhar Conclusão 💧</button>
@@ -60,126 +65,138 @@
   <!-- Mensagem de parabéns -->
   <div id="mensagem"></div>
 
+
+  <!-- Som de comemoração -->
+  <audio id="applause" src="applause.mp3"></audio>
+
   <footer class="text-center py-3 text-white">
     <p class="mb-0">&copy; 2025 Desafio 7 Dias pelo Planeta Água</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const desafios = [
-      'Reduzir o tempo do banho 🚿',
-      'Descobrir de onde vem a água da sua casa 💧',
-      'Reaproveitar água no dia a dia 🌱',
-      'Fechar a torneira enquanto escova os dentes ou lava as vasilhas 💬',
-      'Recolher lixo próximo de um córrego 🗑️',
-      'Criar algo com material reciclável ♻️',
-      'Reduzir o consumo de produtos que gastam muita água pra produzir 💙'
-    ];
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const container = document.getElementById('cards-container');
-    const completionBanner = document.getElementById('completion-banner');
-    const mensagem = document.getElementById('mensagem');
+      // ======== DESAFIOS ========
+      const desafios = [
+        'Reduzir o tempo do banho 🚿',
+        'Descobrir de onde vem a água da sua casa 💧',
+        'Reaproveitar água no dia a dia 🌱',
+        'Fechar a torneira enquanto escova os dentes ou lava as vasilhas 💬',
+        'Recolher lixo próximo de um córrego 🗑️',
+        'Criar algo com material reciclável ♻️',
+        'Reduzir o consumo de produtos que gastam muita água pra produzir 💙'
+      ];
 
-    // Pega status salvo no localStorage
-    const completed = JSON.parse(localStorage.getItem('completedChallenges')) || Array(7).fill(false);
+      const container = document.getElementById('cards-container');
+      const completionBanner = document.getElementById('completion-banner');
+      const mensagem = document.getElementById('mensagem');
+      const progressBar = document.getElementById('progress-bar');
+      const quizSection = document.getElementById('quiz');
+      const quizQuestion = document.getElementById('quiz-question');
+      const quizOptions = document.getElementById('quiz-options');
+      const quizResult = document.getElementById('quiz-result');
+      const quizScore = document.getElementById('quiz-score');
+      const applause = document.getElementById('applause');
 
-    // Cria cards
-    desafios.forEach((texto, index) => {
-      const card = document.createElement('div');
-      card.className = 'col-md-4';
+      let completed = JSON.parse(localStorage.getItem('completedChallenges')) || Array(7).fill(false);
 
-      const isCompleted = completed[index] ? true : false;
-      const buttonText = isCompleted ? '✅ Concluído!' : 'Concluir';
+      function updateProgress() {
+        const done = completed.filter(c => c).length;
+        const percent = (done / 7) * 100;
+        progressBar.style.width = percent + '%';
+        progressBar.textContent = `${done}/7`;
+      }
 
-      card.innerHTML = `
-        <div class="flip-card">
-          <div class="flip-card-inner" id="card-${index}">
-            <div class="flip-card-front d-flex align-items-center justify-content-center flex-column">
-              <h4>Dia ${index + 1}</h4>
-              <p>Toque para ver o desafio</p>
-            </div>
-            <div class="flip-card-back d-flex align-items-center justify-content-center flex-column">
-              <p>${texto}</p>
-              <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-success'} mt-3" id="btn-${index}" onclick="markCompleted(${index})">${buttonText}</button>
+      function markCompleted(i) {
+        if (completed[i]) return;
+        completed[i] = true;
+        localStorage.setItem('completedChallenges', JSON.stringify(completed));
+
+        const btn = document.getElementById(`btn-${i}`);
+        btn.textContent = '✅ Concluído!';
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-secondary');
+
+        // Confete e som
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        applause.play();
+
+        // Mensagem
+        mensagem.textContent = i < 6 ? 'Parabéns e até amanhã!' : 'Parabéns! Você completou o desafio dos 7 dias!';
+        mensagem.style.display = 'block';
+        mensagem.style.animation = 'fadeInOut 2s forwards';
+        setTimeout(() => { mensagem.style.display = 'none'; }, 2000);
+
+        updateProgress();
+        checkCompletion();
+      }
+
+      function checkCompletion() {
+        if (completed.every(c => c)) {
+          completionBanner.classList.remove('d-none');
+          quizSection.classList.remove('d-none');
+          startQuiz();
+        }
+      }
+
+      // Inicializa os cards
+      desafios.forEach((texto, index) => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4';
+        const isCompleted = completed[index];
+        const btnText = isCompleted ? '✅ Concluído!' : 'Concluir';
+
+        card.innerHTML = `
+          <div class="flip-card">
+            <div class="flip-card-inner" id="card-${index}">
+              <div class="flip-card-front d-flex align-items-center justify-content-center flex-column">
+                <h4>Dia ${index + 1}</h4>
+                <p>Toque para ver o desafio</p>
+              </div>
+              <div class="flip-card-back d-flex align-items-center justify-content-center flex-column">
+                <p>${texto}</p>
+                <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-success'} mt-3" id="btn-${index}" onclick="markCompleted(${index})">${btnText}</button>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-      container.appendChild(card);
-    });
-
-    // Flip card
-    document.querySelectorAll('.flip-card').forEach(card => {
-      card.addEventListener('click', () => {
-        card.querySelector('.flip-card-inner').classList.toggle('flipped');
+        `;
+        container.appendChild(card);
       });
-    });
 
-    // Função para marcar como concluído
-    function markCompleted(i) {
-      if (completed[i]) return; // evita duplo clique
+      document.querySelectorAll('.flip-card').forEach(card => {
+        card.addEventListener('click', () => {
+          card.querySelector('.flip-card-inner').classList.toggle('flipped');
+        });
+      });
 
-      completed[i] = true;
-      localStorage.setItem('completedChallenges', JSON.stringify(completed));
-
-      // Atualiza botão
-      const btn = document.getElementById(`btn-${i}`);
-      btn.textContent = '✅ Concluído!';
-      btn.classList.remove('btn-success');
-      btn.classList.add('btn-secondary');
-
-      // Confete
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-
-      // Mensagem
-      if (i < 6) {
-        mensagem.textContent = 'Parabéns e até amanhã!';
-      } else {
-        mensagem.textContent = 'Parabéns! Você completou o desafio dos 7 dias!';
-      }
-      mensagem.style.display = 'block';
-      mensagem.style.animation = 'fadeInOut 2s forwards';
-
-      setTimeout(() => {
-        mensagem.style.display = 'none';
-      }, 2000);
-
+      updateProgress();
       checkCompletion();
-    }
 
-    // Checa se completou todos
-    function checkCompletion() {
-      if (completed.every(c => c)) {
-        completionBanner.classList.remove('d-none');
-      }
-    }
+      // Compartilhar
+      document.getElementById('shareButton').addEventListener('click', async () => {
+        try {
+          const response = await fetch('imagemconcluido.png');
+          const blob = await response.blob();
+          const file = new File([blob], 'imagemconcluido.png', { type: blob.type });
 
-    checkCompletion();
+          const shareData = {
+            title: 'Desafio 7 Dias pelo Planeta Água',
+            text: 'Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍 Participe também! #PlanetaÁgua #Todos pela água',
+            files: [file]
+          };
 
-    // Compartilhar
-    document.getElementById('shareButton').addEventListener('click', async () => {
-      try {
-        const response = await fetch('imagemconcluido.png');
-        const blob = await response.blob();
-        const file = new File([blob], 'imagemconcluido.png', { type: blob.type });
-
-        const shareData = {
-          title: 'Desafio 7 Dias pelo Planeta Água',
-          text: 'Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍 Participe também! #PlanetaÁgua #Todos pela água',
-          files: [file]
-        };
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share(shareData);
-          console.log('Compartilhado com sucesso!');
-        } else {
-          alert('Seu navegador não suporta compartilhamento de arquivos 😕');
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share(shareData);
+          } else {
+            alert('Seu navegador não suporta compartilhamento de arquivos 😕');
+          }
+        } catch (err) {
+          console.error('Erro ao compartilhar:', err);
         }
-      } catch (err) {
-        console.error('Erro ao compartilhar:', err);
-      }
+      });
+
     });
   </script>
 </body>
 </html>
-
