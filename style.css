@@ -87,6 +87,7 @@ body {
   background: white;
   transform: rotateY(180deg);
   color: #333;
+  text-align: center;
 }
 
 footer {
@@ -98,3 +99,4 @@ footer {
     color: black;
     border-color: #88ffdb;
 }
+
