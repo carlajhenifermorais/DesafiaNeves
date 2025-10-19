@@ -5,6 +5,7 @@ body {
 
 .navbar {
   background: linear-gradient(90deg, #00a8ff, #00ffb3);
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .hero {
@@ -90,4 +91,10 @@ body {
 
 footer {
   background: linear-gradient(90deg, #00a8ff, #00ffb3);
+}
+.btn {
+    background: linear-gradient(90deg, #00a8ff, #00ffb3);
+    border-radius: 22px;
+    color: black;
+    border-color: #88ffdb;
 }
