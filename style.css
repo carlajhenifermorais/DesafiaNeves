@@ -99,4 +99,30 @@ footer {
     color: black;
     border-color: #88ffdb;
 }
+#mensagem {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #4facfe, #00f2fe); /* azul degradê */
+  color: #000000;
+  padding: 25px 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeInOut 2s forwards;
+  pointer-events: none;
+}
 
+/* Animação fade-in e fade-out */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -60%) scale(0.8); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); }
+}
