@@ -7,6 +7,8 @@
   <title>Desafio 7 Dias pelo Planeta Água</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <!-- Biblioteca de confete -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
   <!-- Navbar -->
@@ -19,8 +21,8 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
-          <li class="nav-item"><a class="nav-link" href="#desafios">Desafios</a></li>
           <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
+          <li class="nav-item"><a class="nav-link" href="#desafios">Desafios</a></li>
         </ul>
       </div>
     </div>
@@ -35,13 +37,13 @@
     </div>
   </section>
 
-    <!-- Sobre -->
-    <section id="sobre" class="py-5">
-        <div class="container text-center">
-        <h2 class="mb-4">🌍 Sobre o Projeto</h2>
-        <p class="lead">O Desafio 7 Dias pelo Planeta Água incentiva a conscientização sobre o uso da água e mostra como pequenas ações locais ajudam a proteger nossos oceanos e o clima global.</p>
-        </div>
-    </section>
+  <!-- Sobre -->
+  <section id="sobre" class="py-5">
+    <div class="container text-center">
+      <h2 class="mb-4">🌍 Sobre o Projeto</h2>
+      <p class="lead">O Desafio 7 Dias pelo Planeta Água incentiva a conscientização sobre o uso da água e mostra como pequenas ações locais ajudam a proteger nossos oceanos e o clima global.</p>
+    </div>
+  </section>
 
   <!-- Desafios -->
   <section id="desafios" class="py-5 bg-light">
@@ -54,6 +56,11 @@
       </div>
     </div>
   </section>
+
+  <!-- Mensagem de parabéns -->
+  <div id="mensagem" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
+       background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3); font-size:18px; z-index:9999;">
+  </div>
 
   <footer class="text-center py-3 text-white">
     <p class="mb-0">&copy; 2025 Desafio 7 Dias pelo Planeta Água</p>
@@ -73,6 +80,7 @@
 
     const container = document.getElementById('cards-container');
     const completionBanner = document.getElementById('completion-banner');
+    const mensagem = document.getElementById('mensagem');
 
     desafios.forEach((texto, index) => {
       const card = document.createElement('div');
@@ -105,6 +113,26 @@
     function markCompleted(i) {
       completed[i] = true;
       localStorage.setItem('completedChallenges', JSON.stringify(completed));
+
+      // Confete
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      // Mensagem
+      if (i < 6) { // dias 1 a 6
+        mensagem.textContent = 'Parabéns e até amanhã!';
+      } else { // dia 7
+        mensagem.textContent = 'Parabéns! Você completou o desafio dos 7 dias!';
+      }
+      mensagem.style.display = 'block';
+
+      setTimeout(() => {
+        mensagem.style.display = 'none';
+      }, 2000);
+
       checkCompletion();
     }
 
@@ -117,28 +145,26 @@
     checkCompletion();
 
     document.getElementById('shareButton').addEventListener('click', async () => {
-    try {
-        // Carrega a imagem
+      try {
         const response = await fetch('imagemconcluido.png');
         const blob = await response.blob();
         const file = new File([blob], 'imagemconcluido.png', { type: blob.type });
 
         const shareData = {
-        title: 'Desafio 7 Dias pelo Planeta Água',
-        text: 'Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍 Participe também! #PlanetaÁgua #Todos pela água',
-        files: [file] // aqui tá a imagem
+          title: 'Desafio 7 Dias pelo Planeta Água',
+          text: 'Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍 Participe também! #PlanetaÁgua #Todos pela água',
+          files: [file]
         };
 
-        // Checa se o navegador suporta compartilhamento de arquivos
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share(shareData);
-        console.log('Compartilhado com sucesso!');
+          await navigator.share(shareData);
+          console.log('Compartilhado com sucesso!');
         } else {
-        alert('Seu navegador não suporta compartilhamento de arquivos 😕');
+          alert('Seu navegador não suporta compartilhamento de arquivos 😕');
         }
-    } catch (err) {
+      } catch (err) {
         console.error('Erro ao compartilhar:', err);
-    }
+      }
     });
   </script>
 </body>
