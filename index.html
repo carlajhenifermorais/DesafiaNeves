@@ -49,7 +49,7 @@
       <h2 class="text-center mb-5">💦 Os 7 Desafios</h2>
       <div class="row g-4" id="cards-container"></div>
       <div id="completion-banner" class="text-center mt-5 d-none">
-        <h3 class="text-success">🏁 Você completou os 7 desafios!</h3>
+        <h3 class="mb-4">🏁 Você completou os 7 desafios!</h3>
         <button id="shareButton" class="btn btn-primary mt-3">Compartilhar Conclusão 💧</button>
       </div>
     </div>
@@ -118,8 +118,9 @@
 
     document.getElementById('shareButton').addEventListener('click', async () => {
       const shareData = {
+        img: href="imagemconcluido.png",
         title: 'Desafio 7 Dias pelo Planeta Água',
-        text: 'Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍 #PlanetaÁgua #IFMG',
+        text: 'Eu concluí o Desafio 7 Dias pelo Planeta Água 💧🌍 Participe também! #PlanetaÁgua #Todos pela água',
         url: window.location.href
       };
       try {
@@ -131,3 +132,4 @@
   </script>
 </body>
 </html>
+
