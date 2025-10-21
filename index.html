@@ -129,6 +129,7 @@
         }
       }
 
+      // Cria os cards dinamicamente
       desafios.forEach((texto, index) => {
         const card = document.createElement('div');
         card.className = 'col-md-4';
@@ -144,7 +145,7 @@
               </div>
               <div class="flip-card-back d-flex align-items-center justify-content-center flex-column">
                 <p>${texto}</p>
-                <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-success'} mt-3" id="btn-${index}" onclick="markCompleted(${index})">${btnText}</button>
+                <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-success'} mt-3" id="btn-${index}">${btnText}</button>
               </div>
             </div>
           </div>
@@ -152,9 +153,19 @@
         container.appendChild(card);
       });
 
+      // Adiciona evento para flipar o card ao clicar nele
       document.querySelectorAll('.flip-card').forEach(card => {
         card.addEventListener('click', () => {
           card.querySelector('.flip-card-inner').classList.toggle('flipped');
+        });
+      });
+
+      // Adiciona event listener nos botões para concluir desafios
+      document.querySelectorAll('[id^="btn-"]').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation(); // evita o flip junto do clique no botão
+          const index = Number(e.target.id.split('-')[1]);
+          markCompleted(index);
         });
       });
 
@@ -181,6 +192,7 @@
           console.error('Erro ao compartilhar:', err);
         }
       });
+
       const litrosPorMinuto = 12; // média de litros por minuto no banho
 
       document.getElementById('calcular').addEventListener('click', () => {
@@ -202,5 +214,3 @@
   </script>
 </body>
 </html>
-
-
